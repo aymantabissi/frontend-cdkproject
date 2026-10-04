@@ -1,0 +1,34 @@
+@startuml
+
+actor Formateur
+participant "Système" as Sys
+database Base
+participant "Service Notification" as Notif
+
+Formateur -> Sys : Saisir absence
+
+Sys -> Base : Enregistrer absence
+
+Base --> Sys : OK
+
+Sys -> Base : Compter les absences
+
+Base --> Sys : Nombre d'absences
+
+alt Absences > 3
+
+Sys -> Base : Créer alerte
+
+Base --> Sys : Alerte créée
+
+Sys -> Notif : Envoyer notification
+
+Notif --> Sys : Notification envoyée
+
+else Absences <= 3
+
+Sys --> Formateur : Absence enregistrée
+
+end
+
+@enduml

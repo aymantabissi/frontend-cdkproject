@@ -1,0 +1,32 @@
+@startuml
+
+actor Stagiaire
+participant "Système" as Sys
+participant "Gestionnaire de Pôle" as GP
+database Base
+
+Stagiaire -> Sys : Demander inscription
+
+Sys -> Base : Vérifier niveau requis
+
+Base --> Sys : Bac / Bac+
+
+alt Niveau valide
+
+Sys -> GP : Demande de validation
+
+GP --> Sys : Validation
+
+Sys -> Base : Enregistrer inscription
+
+Base --> Sys : OK
+
+Sys --> Stagiaire : Inscription validée
+
+else Niveau insuffisant
+
+Sys --> Stagiaire : Inscription refusée
+
+end
+
+@enduml

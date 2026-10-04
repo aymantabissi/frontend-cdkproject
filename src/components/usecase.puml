@@ -1,0 +1,51 @@
+@startuml
+left to right direction
+
+actor "Stagiaire" as S
+actor "Formateur" as F
+actor "Gestionnaire de Pôle" as G
+actor "Administrateur" as A
+
+rectangle "Plateforme OFPPT" {
+
+usecase "Consulter emploi\n du temps" as UC1
+usecase "Consulter notes" as UC2
+usecase "Consulter absences" as UC3
+usecase "Télécharger attestation" as UC4
+usecase "S'inscrire dans une filière" as UC5
+
+usecase "Saisir les absences" as UC6
+usecase "Saisir les notes" as UC7
+usecase "Publier emploi du temps" as UC8
+
+usecase "Gérer les pôles" as UC9
+usecase "Gérer les filières" as UC10
+usecase "Valider inscription" as UC11
+
+usecase "Gérer les utilisateurs" as UC12
+usecase "Attribuer les rôles" as UC13
+
+usecase "Générer une alerte\n d'absence" as UC14
+
+}
+
+S --> UC1
+S --> UC2
+S --> UC3
+S --> UC4
+S --> UC5
+
+F --> UC6
+F --> UC7
+F --> UC8
+
+G --> UC9
+G --> UC10
+G --> UC11
+
+A --> UC12
+A --> UC13
+
+UC6 ..> UC14 : <<extend>>\nAbsences > 3
+
+@enduml

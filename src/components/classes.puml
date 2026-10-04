@@ -1,0 +1,94 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+class Utilisateur{
+-id:int
+-nom:String
+-prenom:String
+-email:String
+-password:String
++seConnecter()
+}
+
+class Stagiaire{
+-matricule:String
+-niveau:String
+}
+
+class Formateur
+
+class GestionnairePole
+
+class Administrateur
+
+Utilisateur <|-- Stagiaire
+Utilisateur <|-- Formateur
+Utilisateur <|-- GestionnairePole
+Utilisateur <|-- Administrateur
+
+class Pole{
+-id:int
+-nom:String
+}
+
+class Filiere{
+-id:int
+-nom:String
+-niveauRequis:String
+}
+
+Pole "1" -- "*" Filiere
+
+class Inscription{
+-id:int
+-dateInscription:Date
+-statut:String
+}
+
+Stagiaire "1" -- "*" Inscription
+Filiere "1" -- "*" Inscription
+
+class EmploiTemps{
+-id:int
+-dateDebut:Date
+-dateFin:Date
+}
+
+Filiere "1" -- "*" EmploiTemps
+
+class Absence{
+-id:int
+-date:Date
+-nombreHeures:int
+}
+
+Stagiaire "1" -- "*" Absence
+Formateur "1" -- "*" Absence
+
+class Note{
+-id:int
+-valeur:float
+-module:String
+}
+
+Stagiaire "1" -- "*" Note
+Formateur "1" -- "*" Note
+
+class Alerte{
+-id:int
+-message:String
+-date:Date
+}
+
+Absence "1" --> "0..1" Alerte
+
+class Attestation{
+-id:int
+-type:String
+-dateGeneration:Date
+}
+
+Stagiaire "1" -- "*" Attestation
+
+@enduml
