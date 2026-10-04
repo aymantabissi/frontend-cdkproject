@@ -13,6 +13,7 @@ import DashboardPage  from "./pages/DashboardPage";
 import AboutPage      from "./pages/AboutPage";
 import MyResults      from "./pages/MyResults";
 import AdminPage      from "./pages/AdminPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
 // ── Unauthorized ───────────────────────────────────────────────────────────────
 const Unauthorized = () => (
@@ -74,6 +75,13 @@ export default function App() {
           <Route path="/my-results" element={
             <ProtectedRoute roles={["patient", "doctor", "admin"]}>
               <MyResults />
+            </ProtectedRoute>
+          } />
+
+          {/* ── Change password — tous les rôles ── */}
+          <Route path="/change-password" element={
+            <ProtectedRoute roles={["patient", "doctor", "admin"]}>
+              <ChangePasswordPage />
             </ProtectedRoute>
           } />
 

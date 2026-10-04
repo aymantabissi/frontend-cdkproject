@@ -28,6 +28,15 @@ function SectionTitle({ title, type }) {
   );
 }
 
+// kolchi darouri — backend kayrfd ay prédiction fiha champ khawi
+const FIELD_LABELS = {
+  patient_name: "Patient Name",
+  age: "Age", bp: "Blood Pressure", creatinine: "Creatinine", urea: "Urea",
+  hemoglobin: "Hemoglobin", sodium: "Sodium", potassium: "Potassium",
+  protein: "Protein", glucose: "Glucose", rbc: "RBC",
+  diabetes: "Diabetes", hypertension: "Hypertension",
+};
+
 export default function KidneyForm() {
   const [file,    setFile]    = useState(null);
   const navigate              = useNavigate();
@@ -48,8 +57,11 @@ export default function KidneyForm() {
 
   // ─── Predict ────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    if (!form.patient_name ||  !form.age || !form.bp || !form.creatinine) {
-      toast.error("Age, Blood Pressure, and Creatinine are required.");
+    const missing = Object.entries(FIELD_LABELS)
+      .filter(([key]) => form[key] === "" || form[key] == null)
+      .map(([, label]) => label);
+    if (missing.length) {
+      toast.error(`Missing fields: ${missing.join(", ")}`);
       return;
     }
     setLoading(true);
@@ -72,13 +84,18 @@ export default function KidneyForm() {
     formData.append("file", file);
 
     try {
+      const stored = localStorage.getItem("nephroai_user");
+      const token  = stored ? JSON.parse(stored)?.token : "";
       const res  = await fetch(`${BASE_URL}/upload`, {
-        method: "POST",
-        body:   formData,
+        method:  "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body:    formData,
       });
       const data = await res.json();
 
-      if (data.inputs) {
+      if (!res.ok) {
+        toast.error(data.error || "Server error");
+      } else if (data.inputs) {
         setForm(data.inputs);
         const pred = data.prediction === 1 ? "high" : "low";
         setResult(pred);
@@ -190,16 +207,16 @@ export default function KidneyForm() {
                     <Field label="Creatinine" unit="mg/dL" required>
                       <NumInput name="creatinine" placeholder="1.2" step="0.1" value={form.creatinine} onChange={set} />
                     </Field>
-                    <Field label="Blood Urea" unit="mg/dL">
+                    <Field label="Blood Urea" unit="mg/dL" required>
                       <NumInput name="urea" placeholder="40" value={form.urea} onChange={set} />
                     </Field>
-                    <Field label="Hemoglobin" unit="g/dL">
+                    <Field label="Hemoglobin" unit="g/dL" required>
                       <NumInput name="hemoglobin" placeholder="13.5" step="0.1" value={form.hemoglobin} onChange={set} />
                     </Field>
-                    <Field label="Sodium" unit="mEq/L">
+                    <Field label="Sodium" unit="mEq/L" required>
                       <NumInput name="sodium" placeholder="138" value={form.sodium} onChange={set} />
                     </Field>
-                    <Field label="Potassium" unit="mEq/L">
+                    <Field label="Potassium" unit="mEq/L" required>
                       <NumInput name="potassium" placeholder="4.0" step="0.1" value={form.potassium} onChange={set} />
                     </Field>
                   </div>
@@ -213,13 +230,13 @@ export default function KidneyForm() {
                 <div>
                   <SectionTitle title="Urine Analysis" type="urine" />
                   <div className="grid grid-cols-2 gap-4">
-                    <Field label="Protein">
+                    <Field label="Protein" required>
                       <Toggle name="protein" value={form.protein} onChange={set} />
                     </Field>
-                    <Field label="Glucose">
+                    <Field label="Glucose" required>
                       <Toggle name="glucose" value={form.glucose} onChange={set} />
                     </Field>
-                    <Field label="Red Blood Cells (RBC)">
+                    <Field label="Red Blood Cells (RBC)" required>
                       <Toggle name="rbc" value={form.rbc} onChange={set} />
                     </Field>
                   </div>
@@ -228,10 +245,10 @@ export default function KidneyForm() {
                 <div>
                   <SectionTitle title="Medical History" type="history" />
                   <div className="grid grid-cols-2 gap-4">
-                    <Field label="Diabetes">
+                    <Field label="Diabetes" required>
                       <Toggle name="diabetes" value={form.diabetes} onChange={set} />
                     </Field>
-                    <Field label="Hypertension">
+                    <Field label="Hypertension" required>
                       <Toggle name="hypertension" value={form.hypertension} onChange={set} />
                     </Field>
                   </div>

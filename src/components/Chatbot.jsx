@@ -1,8 +1,10 @@
 // src/components/Chatbot.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { BASE_URL } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Chatbot() {
+  const { user, authHeader }    = useAuth();
   const [isOpen, setIsOpen]     = useState(false);
  const [messages, setMessages] = useState([
   { text: "Bonjour ! Je suis NephroAI Assistant 🩺 — Comment puis-je vous aider concernant les maladies rénales ?", isBot: true },
@@ -25,11 +27,14 @@ export default function Chatbot() {
     try {
       const response = await fetch(`${BASE_URL}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeader(),
         body: JSON.stringify({ message: input }),
       });
       const data = await response.json();
-      setMessages((prev) => [...prev, { text: data.reply, isBot: true }]);
+      const text = response.status === 429
+        ? "Trop de messages — réessayez dans une minute ⏳"
+        : response.ok ? data.reply : (data.error || "Erreur serveur");
+      setMessages((prev) => [...prev, { text, isBot: true }]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -39,6 +44,9 @@ export default function Chatbot() {
       setLoading(false);
     }
   };
+
+  // chatbot ghir l'users li dakhlin (backend /chat kaytlb token)
+  if (!user) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-[9999]">
